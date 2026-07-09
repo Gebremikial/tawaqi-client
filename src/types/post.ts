@@ -1,5 +1,5 @@
 // src/types/post.ts
-import { User } from './user';
+import type { User } from './user';
 
 export interface Post {
   id: string;
