@@ -1,13 +1,15 @@
-import axios from 'axios'
+import axios from "axios";
 
-export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
-  withCredentials: true,
-})
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true, // needed because refresh tokens live in httpOnly cookies (Section 10.1)
+});
 
-export const api = {
-  get: <T>(url: string) => apiClient.get<T>(url),
-  post: <T, D = unknown>(url: string, data: D) => apiClient.post<T>(url, data),
-  put: <T, D = unknown>(url: string, data: D) => apiClient.put<T>(url, data),
-  del: <T>(url: string) => apiClient.delete<T>(url),
-}
+// Attach the access token to every outgoing request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
